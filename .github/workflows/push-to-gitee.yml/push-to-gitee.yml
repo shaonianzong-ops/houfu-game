@@ -1,0 +1,27 @@
+name: Push to Gitee
+
+on:
+  workflow_dispatch:
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download index.html from release
+        run: |
+          curl -L -o index.html "https://github.com/shaonianzong-ops/houfu-game/releases/download/v1.0.0/index.html"
+          ls -l index.html
+          sha256sum index.html
+      - name: Push to Gitee
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          git clone "https://oauth2:${GITEE_TOKEN}@gitee.com/shaonianzong/houfu-game.git" gitee-repo
+          cp index.html gitee-repo/index.html
+          cd gitee-repo
+          git config user.name "shaonianzong"
+          git config user.email "shaonianzong@gmail.com"
+          git add index.html
+          git commit -m "上传侯府丫鬟上位模拟器 index.html" || echo "nothing to commit"
+          git push origin master
+          ls -l
